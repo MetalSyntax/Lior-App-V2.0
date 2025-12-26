@@ -1,0 +1,5 @@
+{
+  "name": "Lior Pedidos App",
+  "description": "A mobile-first sales application featuring user selection login, a dashboard with sales metrics, and a product ordering system with cart functionality.",
+  "requestFramePermissions": []
+}
