@@ -19,7 +19,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   }, [searchTerm]);
 
   return (
-    <div className="flex flex-col min-h-screen relative bg-background-light">
+    <div className="flex flex-col min-h-dvh relative bg-background-light">
       {/* Background Decor */}
       <div className="fixed top-0 left-0 w-full h-[50vh] md:h-[40vh] bg-gradient-to-b from-[#6FA89C] to-[#5D9489] rounded-b-[40px] md:rounded-b-[80px] z-0 shadow-lg" />
       

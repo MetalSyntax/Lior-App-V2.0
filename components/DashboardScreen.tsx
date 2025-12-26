@@ -13,7 +13,7 @@ interface DashboardScreenProps {
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onNavigate, onLogout }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-background-light">
+    <div className="flex flex-col min-h-dvh bg-background-light">
       {/* Header */}
       <header className="bg-secondary text-white pt-12 pb-16 px-6 rounded-b-[2.5rem] md:rounded-b-[4rem] shadow-lg sticky top-0 z-20">
         <div className="max-w-6xl mx-auto w-full">

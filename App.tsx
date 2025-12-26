@@ -47,7 +47,7 @@ const App: React.FC = () => {
   const cartSubtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cart]);
 
   return (
-    <div className="w-full min-h-screen bg-background-light font-body text-text-dark">
+    <div className="w-full min-h-dvh bg-background-light font-body text-text-dark">
       {currentView === 'LOGIN' && (
         <LoginScreen onLogin={handleLogin} />
       )}

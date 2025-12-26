@@ -40,9 +40,9 @@ const ProductScreen: React.FC<ProductScreenProps> = ({ cart, onUpdateCart, onBac
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light pb-32">
+    <div className="flex flex-col min-h-dvh bg-background-light pb-32">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-secondary shadow-md px-6 py-4">
+      <header className="sticky top-0 z-50 bg-secondary shadow-md px-6 py-4 pt-safe">
         <div className="max-w-7xl mx-auto flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
             <button 
@@ -176,7 +176,7 @@ const ProductScreen: React.FC<ProductScreenProps> = ({ cart, onUpdateCart, onBac
       </main>
 
       {/* Bottom Sheet Summary - Fixed Bottom Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 w-full bg-text-dark shadow-[0_-8px_30px_rgba(0,0,0,0.3)] rounded-t-3xl transition-transform duration-300 z-40 ${totalItems > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className={`fixed bottom-0 left-0 right-0 w-full bg-text-dark shadow-[0_-8px_30px_rgba(0,0,0,0.3)] rounded-t-3xl transition-transform duration-300 z-40 pb-safe ${totalItems > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="w-full flex justify-center pt-3 pb-1">
             <div className="w-12 h-1.5 bg-white/20 rounded-full"></div>
         </div>

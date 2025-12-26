@@ -43,9 +43,9 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light">
+    <div className="flex flex-col min-h-dvh bg-background-light">
       {/* Header */}
-      <header className="bg-secondary text-white pt-8 pb-8 px-6 rounded-b-[2rem] shadow-lg sticky top-0 z-20">
+      <header className="bg-secondary text-white pt-8 pb-8 px-6 rounded-b-[2rem] shadow-lg sticky top-0 z-20 pt-safe">
         <div className="max-w-4xl mx-auto w-full">
             <div className="flex items-center gap-3 mb-4">
             <button 

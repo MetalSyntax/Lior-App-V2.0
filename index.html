@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#6FA89C" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Lior Pedidos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -32,6 +35,12 @@
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(59, 40, 40, 0.08)',
                         'glow': '0 10px 30px -5px rgba(240, 147, 43, 0.3)',
+                    },
+                    height: {
+                        'dvh': '100dvh'
+                    },
+                    minHeight: {
+                        'dvh': '100dvh'
                     }
                 },
             },
@@ -40,6 +49,7 @@
     <style>
         body {
             -webkit-tap-highlight-color: transparent;
+            background-color: #EFEBE4; /* Match background-light */
         }
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
@@ -47,6 +57,16 @@
         .hide-scrollbar {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+        /* Safe Area Utilities for Mobile Notches */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .pt-safe {
+            padding-top: env(safe-area-inset-top);
+        }
+        .mb-safe {
+            margin-bottom: env(safe-area-inset-bottom);
         }
     </style>
 <script type="importmap">
@@ -60,7 +80,8 @@
 }
 </script>
 </head>
-<body class="bg-background-light text-text-dark font-body antialiased min-h-screen">
+<body class="bg-background-light text-text-dark font-body antialiased min-h-dvh">
     <div id="root"></div>
+    <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
 </body>
 </html>
