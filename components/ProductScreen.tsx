@@ -71,7 +71,7 @@ const ProductScreen: React.FC<ProductScreenProps> = ({ cart, onUpdateCart, onBac
         {/* Search & Filter */}
         <section className="space-y-4">
             <h2 className="text-2xl font-bold text-text-dark font-display">Seleccione un Producto</h2>
-            <div className="relative group max-w-xl">
+            <div className="relative group">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 group-focus-within:text-secondary transition-colors">
                     <Search className="w-5 h-5" />
                 </span>

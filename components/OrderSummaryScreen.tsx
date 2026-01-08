@@ -12,30 +12,81 @@ interface OrderSummaryScreenProps {
 }
 
 const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onBack, onFinish, totalItems, subtotal }) => {
+  const [discountType, setDiscountType] = React.useState('normal');
+
+  const discountMultiplier = {
+    'normal': 1,
+    '20%': 0.8,
+    '30%': 0.7
+  }[discountType] || 1;
+
+  const finalSubtotal = subtotal * discountMultiplier;
 
   const handleDownloadCSV = () => {
     // BOM for Excel to read UTF-8 correctly
     const BOM = "\uFEFF"; 
-    const headers = "ID,Producto,Categoría,Precio Unitario,Cantidad,Total\n";
     
-    const rows = cart.map(item => {
-        // Escape quotes in names
-        const safeName = `"${item.name.replace(/"/g, '""')}"`;
-        const total = (item.price * item.quantity).toFixed(2);
-        return `${item.id},${safeName},${item.category},${item.price},${item.quantity},${total}`;
-    }).join("\n");
-
-    const summaryRow = `\n,,,,,Subtotal,${subtotal.toFixed(2)}`;
-    const userRow = `\nCliente: ${user.name} (${user.id})\nFecha: ${new Date().toLocaleDateString()}`;
-
-    const csvContent = BOM + userRow + "\n\n" + headers + rows + summaryRow;
+    // Dates for filename
+    const today = new Date();
+    const dateStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
     
+    // Calculations
+    const colecciones = finalSubtotal * 0.02;
+    const proximaColeccion = 5.00;
+    const sobrante = finalSubtotal;
+
+    let csvContent = BOM;
+    
+    // Header Info
+    csvContent += ` ,Cliente\n`;
+    csvContent += ` ,${user.name}\n`; 
+    csvContent += ` ,Codigo\n`;
+    csvContent += ` ,${user.id}\n`;
+    
+    // Table Headers
+    csvContent += ` ,Codigo,Productos,Cantidad,Precio Unitario,Subtotal,Descuento\n`;
+    
+    // Table Rows
+    cart.forEach(item => {
+        // Line items show base price and subtotal. 
+        // If the business logic requires line-item discount application in the CSV, we would do it here.
+        // For now, we follow the pattern that 'Descuento' column indicates the rate.
+        // We will apply the discount to the totals. 
+        // OR: should we apply it to the line subtotal? 
+        // Lets keep line subtotal as base, and just indicate discount. 
+        // BUT better UX/Logic: If I buy with 20% discount, the line subtotal might technically be lower?
+        // Let's stick to the user request: "salida debe ser igual a [CSV]". [CSV] has "normal".
+        
+        let itemSubtotalVal = item.price * item.quantity;
+        if (discountType !== 'normal') {
+             itemSubtotalVal = itemSubtotalVal * discountMultiplier;
+        }
+
+        const itemSubtotal = itemSubtotalVal.toFixed(2);
+        
+        const safeName = item.name.includes(',') || item.name.includes('"') 
+            ? `"${item.name.replace(/"/g, '""')}"` 
+            : item.name;
+        
+        csvContent += ` ,${item.id},${safeName},${item.quantity},${item.price.toFixed(2)},${itemSubtotal},${discountType}\n`;
+    });
+    
+    // Footer Info
+    csvContent += ` ,Precio Total\n`;
+    csvContent += ` ,${finalSubtotal.toFixed(2)}\n`;
+    csvContent += ` ,Colecciones\n`;
+    csvContent += ` ,${colecciones.toFixed(2)}\n`;
+    csvContent += ` ,Proxima Coleccion\n`;
+    csvContent += ` ,${proximaColeccion.toFixed(2)}\n`;
+    csvContent += ` ,Sobrante\n`;
+    csvContent += ` ,${sobrante.toFixed(2)}\n`;
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Pedido_${user.id}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute("download", `Pedido de ${user.id} del ${dateStr}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -64,7 +115,7 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
                     <p className="text-xs text-white/70">{user.id}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-3xl font-bold font-display">${subtotal.toFixed(2)}</p>
+                    <p className="text-3xl font-bold font-display">${finalSubtotal.toFixed(2)}</p>
                     <p className="text-xs text-white/70">{totalItems} Artículos</p>
                 </div>
             </div>
@@ -72,6 +123,30 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
       </header>
 
       <main className="flex-1 px-6 py-6 space-y-4 max-w-4xl mx-auto w-full">
+        
+        {/* Discount Selector */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-2">
+            <label className="text-xs font-bold text-text-dark uppercase tracking-wide mb-2 block">
+                Descuento Aplicable
+            </label>
+            <div className="relative">
+                <select
+                    value={discountType}
+                    onChange={(e) => setDiscountType(e.target.value)}
+                    className="w-full appearance-none bg-background-light border border-gray-200 text-text-dark text-sm rounded-lg focus:ring-secondary focus:border-secondary block p-3 pr-8 outline-none font-medium transition-all"
+                >
+                    <option value="normal">Descuento normal</option>
+                    <option value="20%">Dcto 20%</option>
+                    <option value="30%">Dcto 30%</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
         {cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
                 <AlertCircle className="w-16 h-16 mb-4 opacity-50" />
@@ -87,7 +162,9 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
                         </div>
                         <div className="text-right flex flex-col items-end gap-1">
                             <span className="text-xs font-bold bg-gray-100 px-2 py-1 rounded text-text-dark">x{item.quantity}</span>
-                            <span className="font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-bold text-primary">
+                                ${(item.price * item.quantity * discountMultiplier).toFixed(2)}
+                            </span>
                         </div>
                     </div>
                 ))}
@@ -108,7 +185,10 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
             </button>
             
             <button 
-                onClick={onFinish}
+                onClick={() => {
+                    handleDownloadCSV();
+                    onFinish();
+                }}
                 className="w-full bg-text-dark hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
                 <CheckCircle className="w-5 h-5" />

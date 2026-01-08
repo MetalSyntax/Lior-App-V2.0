@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { User } from '../types';
 import { USERS } from '../constants';
 import { ChevronRight, Search } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 interface LoginScreenProps {
   onLogin: (user: User) => void;
@@ -28,20 +29,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
         
         {/* Logo Section */}
         <div className="flex flex-col items-center mb-8 animate-fade-in-down">
-          <div className="w-40 h-40 rounded-full bg-white flex items-center justify-center shadow-xl mb-6 border-4 border-secondary/20 overflow-hidden p-4">
+          <div className="w-[160px] h-[160px] rounded-full flex items-center justify-center shadow-xl mb-6 border-4 border-secondary/20 overflow-hidden">
              <img 
-               src="https://via.placeholder.com/150?text=LIOR" 
+               src={logo} 
                alt="Lior Pedidos" 
-               className="w-full h-full object-contain"
-               onError={(e) => {
-                 (e.target as HTMLImageElement).style.display = 'none';
-                 (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-               }}
+               className="w-full h-full object-contain block"
              />
-             <div className="hidden text-center">
-                <span className="block text-2xl font-bold text-secondary tracking-[0.2em]">LIOR</span>
-                <span className="block text-[10px] text-text-dark font-semibold uppercase tracking-[0.3em] mt-1">Pedidos</span>
-            </div>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2 font-display text-center drop-shadow-md">Bienvenido</h1>
           <p className="text-white/90 text-sm font-medium text-center">Seleccione su usuario para continuar</p>
@@ -49,7 +42,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
         {/* User Selection Card */}
         <div className="w-full bg-white/60 backdrop-blur-md p-6 rounded-2xl shadow-soft border border-white/40 animate-fade-in-up flex flex-col max-h-[500px]">
-          <div className="space-y-3 flex flex-col h-full">
+          <div className="space-y-3 flex flex-col h-[350px] overflow-y-auto hide-scrollbar">
             <label className="text-xs font-bold text-text-dark uppercase tracking-wide ml-1 mb-2 block">
                 Búsqueda de Usuario
             </label>
