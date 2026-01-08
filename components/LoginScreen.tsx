@@ -103,8 +103,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           </div>
         </div>
 
-        <div className="mt-8 mb-4">
-            <p className="text-[10px] text-text-dark/40 font-bold tracking-widest uppercase">Lior Pedidos v2.1</p>
+        <div className="mt-8 mb-6 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                Todos los derechos reservados © 2025.<br />
+                Creado por <a href="https://metalsyntax.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-700 dark:text-gray-300">MetaSyntax</a> para Lior Cosmetic.
+            </p>
         </div>
 
       </main>
