@@ -27,4 +27,14 @@ export interface Order {
     timeAgo: string;
 }
 
+export interface StoredOrder {
+    id: string;
+    date: string;
+    displayDate: string;
+    cart: CartItem[];
+    total: number;
+    discountType: string;
+    userId: string;
+}
+
 export type ViewState = 'LOGIN' | 'DASHBOARD' | 'PRODUCTS' | 'SUMMARY';

@@ -2,8 +2,11 @@ import React from 'react';
 import { User, ViewState } from '../types';
 import { 
     Plus, 
-    LogOut
+    LogOut,
+    FileSpreadsheet, 
+    Clock
 } from 'lucide-react';
+import { StoredOrder } from '../types';
 
 interface DashboardScreenProps {
   user: User;
@@ -12,6 +15,82 @@ interface DashboardScreenProps {
 }
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onNavigate, onLogout }) => {
+  const [pastOrders, setPastOrders] = React.useState<StoredOrder[]>([]);
+
+  React.useEffect(() => {
+    try {
+        const saved = JSON.parse(localStorage.getItem('lior_orders') || '[]');
+        // Filter by user and sort by date desc
+        const userOrders = saved
+            .filter((o: any) => o.userId === user.id)
+            .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setPastOrders(userOrders);
+    } catch (e) {
+        console.error("Error loading orders", e);
+    }
+  }, [user.id]);
+
+  const handleDownloadHistoryCSV = (order: StoredOrder) => {
+    const BOM = "\uFEFF"; 
+    
+    // Derived values
+    const discountMultiplier = {
+        'normal': 1,
+        '20%': 0.8,
+        '30%': 0.7
+    }[order.discountType] || 1;
+
+    const finalSubtotal = order.total;
+    
+    // Recalculate based on total
+    const colecciones = finalSubtotal * 0.02;
+    const proximaColeccion = 5.00;
+    const sobrante = finalSubtotal;
+
+    let csvContent = BOM;
+    
+    csvContent += ` ,Cliente\n`;
+    csvContent += ` ,${user.name}\n`; 
+    csvContent += ` ,Codigo\n`;
+    csvContent += ` ,${user.id}\n`;
+    
+    csvContent += ` ,Codigo,Productos,Cantidad,Precio Unitario,Subtotal,Descuento\n`;
+    
+    order.cart.forEach(item => {
+        let itemSubtotalVal = item.price * item.quantity;
+        if (order.discountType !== 'normal') {
+             itemSubtotalVal = itemSubtotalVal * discountMultiplier;
+        }
+        const itemSubtotal = itemSubtotalVal.toFixed(2);
+        
+        const safeName = item.name.includes(',') || item.name.includes('"') 
+            ? `"${item.name.replace(/"/g, '""')}"` 
+            : item.name;
+        
+        csvContent += ` ,${item.id},${safeName},${item.quantity},${item.price.toFixed(2)},${itemSubtotal},${order.discountType}\n`;
+    });
+    
+    csvContent += ` ,Precio Total\n`;
+    csvContent += ` ,${finalSubtotal.toFixed(2)}\n`;
+    csvContent += ` ,Colecciones\n`;
+    csvContent += ` ,${colecciones.toFixed(2)}\n`;
+    csvContent += ` ,Proxima Coleccion\n`;
+    csvContent += ` ,${proximaColeccion.toFixed(2)}\n`;
+    csvContent += ` ,Sobrante\n`;
+    csvContent += ` ,${sobrante.toFixed(2)}\n`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Pedido de ${user.id} del ${order.displayDate}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="flex flex-col min-h-dvh bg-background-light">
       {/* Header */}
@@ -57,12 +136,45 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onNavigate, onL
                     </div>
                 </div>
             </button>
+        </div>
 
-            <div className="mt-8 text-center px-8">
-                 <p className="text-sm text-gray-400 font-medium leading-relaxed max-w-md mx-auto">
-                    Las funcionalidades adicionales del panel están deshabilitadas temporalmente por mantenimiento.
-                 </p>
-            </div>
+        {/* History Section */}
+        <div className="pb-10">
+            <h3 className="text-lg font-bold text-text-dark font-display mb-4 px-2">Historial de Pedidos</h3>
+            
+            {pastOrders.length === 0 ? (
+                <div className="text-center py-10 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-400 font-medium">No hay pedidos recientes</p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {pastOrders.map((order) => (
+                        <div key={order.id} className="bg-white p-5 rounded-2xl shadow-soft border border-gray-100 flex items-center justify-between group hover:border-secondary/30 transition-all">
+                            <div className="flex flex-col gap-1">
+                                <span className="font-bold text-text-dark text-base">{order.id}</span>
+                                <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    <span>{order.displayDate}</span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-6">
+                                <span className="text-lg font-bold text-primary font-display">
+                                    ${order.total.toFixed(2)}
+                                </span>
+                                <button 
+                                    onClick={() => handleDownloadHistoryCSV(order)}
+                                    className="p-2.5 rounded-xl bg-gray-50 text-gray-400 hover:bg-green-50 hover:text-green-600 transition-colors border border-gray-100 h-10 w-10 flex items-center justify-center"
+                                    title="Descargar CSV"
+                                >
+                                    <FileSpreadsheet className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
 
       </main>

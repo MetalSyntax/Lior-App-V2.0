@@ -187,6 +187,26 @@ const OrderSummaryScreen: React.FC<OrderSummaryScreenProps> = ({ cart, user, onB
             <button 
                 onClick={() => {
                     handleDownloadCSV();
+                    
+                    // Save to local storage
+                    const today = new Date();
+                    const newOrder = {
+                        id: `ORD-${Date.now().toString().slice(-6)}`,
+                        date: today.toISOString(),
+                        displayDate: `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`,
+                        cart,
+                        total: finalSubtotal,
+                        discountType,
+                        userId: user.id
+                    };
+                    
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('lior_orders') || '[]');
+                        localStorage.setItem('lior_orders', JSON.stringify([newOrder, ...saved]));
+                    } catch (e) {
+                        console.error('Error saving order', e);
+                    }
+
                     onFinish();
                 }}
                 className="w-full bg-text-dark hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
